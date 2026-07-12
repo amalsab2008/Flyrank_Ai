@@ -78,4 +78,40 @@ Fetch the tasks list again:
 ```bash
 curl http://localhost:3000/tasks
 ```
-*Expected Result*: The task `"Verify Docker Persistence"` is still present, proving that the PostgreSQL volume has successfully persisted the data across restarts.
+*   **Expected Result**: The task `"Verify Docker Persistence"` is still present, proving that the PostgreSQL volume has successfully persisted the data across restarts.
+
+---
+
+## 5. AI API Integration (Connect to an AI API)
+
+The backend includes a swappable AI client wrapper that integrates with LLM APIs (Gemini, Groq, or local Ollama) to extract tasks from unstructured raw text.
+
+### The Seam Pattern
+All model-specific details are isolated within `src/services/aiService.js`. Switching between models is controlled 100% via environment variables in `.env` without modifying routes or services:
+- `AI_PROVIDER`: `gemini` | `groq` | `ollama`
+- `AI_MODEL`: Model name (e.g., `gemini-1.5-flash` or `llama3-8b-8192`)
+- `GEMINI_API_KEY` / `GROQ_API_KEY`: API keys (hidden in `.env`, never committed)
+
+### Endpoints
+*   **POST `/tasks/extract`**: Takes raw user text, executes task extraction via the selected LLM, validates output into structured JSON, saves each extracted task into the database, and returns the saved array.
+
+**Request**:
+```bash
+curl -X POST http://localhost:3000/tasks/extract \
+     -H "Content-Type: application/json" \
+     -d '{"text": "I need to review code today and deployment is on Friday morning"}'
+```
+
+**Expected Response**:
+```json
+[
+  { "id": 1, "title": "Review code", "completed": false },
+  { "id": 2, "title": "Deployment", "completed": false }
+]
+```
+
+### Safety and Reliability Features
+- **Structured JSON Validation**: Enforces JSON response formats. If the model output cannot be parsed, the app gracefully returns a `500` error instead of crashing.
+- **Strict Timeouts**: Every LLM call is wrapped in a timeout (default `8000ms`) via `AbortController` to prevent hanging processes.
+- **Smart Retries with Backoff**: The HTTP layer automatically retries failed requests if the API returns rate limits (`429`) or server errors (`5xx`) using exponential backoff. Client failures (`400`, `401`, `403`) fail immediately.
+- **Token Logging & Cost Estimates**: Every request logs the model name, input/output token counts, and calculates real-time USD costs based on public pricing schedules ($0.075/M input, $0.30/M output for Gemini Flash).

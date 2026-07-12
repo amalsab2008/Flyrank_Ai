@@ -4,6 +4,7 @@ const express = require('express');
 const InMemoryTaskRepository = require('./src/repositories/inMemoryTaskRepository');
 const PostgresTaskRepository = require('./src/repositories/postgresTaskRepository');
 const TaskService = require('./src/services/taskService');
+const AiService = require('./src/services/aiService');
 const createRouter = require('./src/routes');
 
 const app = express();
@@ -27,15 +28,18 @@ if (DB_TYPE === 'postgres') {
 // Inject repository into Service
 const taskService = new TaskService(repository);
 
+// Initialize AI Service
+const aiService = new AiService();
+
 // Express Middleware
 app.use(express.json());
 
-// Bind Router
-app.use('/', createRouter(taskService));
+// Bind Router with injected Services
+app.use('/', createRouter(taskService, aiService));
 
 // Fallback health status endpoint
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', db: DB_TYPE, time: new Date().toISOString() });
+  res.json({ status: 'ok', db: DB_TYPE, ai: aiService.provider, time: new Date().toISOString() });
 });
 
 app.use((req, res) => {
