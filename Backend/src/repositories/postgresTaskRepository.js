@@ -21,6 +21,17 @@ class PostgresTaskRepository extends TaskRepository {
     );
     return result.rows[0];
   }
+
+  async getStats() {
+    const result = await this.pool.query(`
+      SELECT 
+        COUNT(*)::integer as total,
+        COALESCE(SUM(CASE WHEN completed = true THEN 1 ELSE 0 END), 0)::integer as completed,
+        COALESCE(SUM(CASE WHEN completed = false THEN 1 ELSE 0 END), 0)::integer as pending
+      FROM tasks
+    `);
+    return result.rows[0];
+  }
 }
 
 module.exports = PostgresTaskRepository;

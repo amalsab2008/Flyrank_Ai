@@ -13,6 +13,10 @@ class TaskService {
     }
     return await this.taskRepository.create(title.trim(), completed);
   }
+
+  async getStats() {
+    return await this.taskRepository.getStats();
+  }
 }
 
 module.exports = TaskService;

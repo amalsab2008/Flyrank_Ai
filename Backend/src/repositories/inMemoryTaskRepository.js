@@ -17,6 +17,13 @@ class InMemoryTaskRepository extends TaskRepository {
     this.tasks.push(task);
     return task;
   }
+
+  async getStats() {
+    const total = this.tasks.length;
+    const completed = this.tasks.filter(t => t.completed).length;
+    const pending = total - completed;
+    return { total, completed, pending };
+  }
 }
 
 module.exports = InMemoryTaskRepository;
