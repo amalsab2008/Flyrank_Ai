@@ -1,28 +1,47 @@
-const http = require('http');
+require('dotenv').config();
+const express = require('express');
 
-const PORT = 3000;
+const InMemoryTaskRepository = require('./src/repositories/inMemoryTaskRepository');
+const PostgresTaskRepository = require('./src/repositories/postgresTaskRepository');
+const TaskService = require('./src/services/taskService');
+const createRouter = require('./src/routes');
 
-const server = http.createServer((req, res) => {
-  // Set Content-Type as JSON for all API responses
-  res.setHeader('Content-Type', 'application/json');
+const app = express();
+const PORT = process.env.PORT || 3000;
+const DB_TYPE = process.env.DB_TYPE || 'memory';
 
-  if (req.url === '/' && req.method === 'GET') {
-    res.writeHead(200);
-    res.end(JSON.stringify({ status: "ok", message: "Welcome to my backend!" }));
-  } else if (req.url === '/api/info' && req.method === 'GET') {
-    res.writeHead(200);
-    res.end(JSON.stringify({
-      track: "Backend AI Engineering",
-      assignment: "BE-01: Build your first API endpoint",
-      author: "Amal S",
-      timestamp: new Date().toISOString()
-    }));
-  } else {
-    res.writeHead(404);
-    res.end(JSON.stringify({ error: "Not Found", path: req.url }));
+// Initialize the repository based on configuration
+let repository;
+if (DB_TYPE === 'postgres') {
+  console.log('Using PostgreSQL Database Repository');
+  if (!process.env.DATABASE_URL) {
+    console.error('DATABASE_URL environment variable is missing.');
+    process.exit(1);
   }
+  repository = new PostgresTaskRepository(process.env.DATABASE_URL);
+} else {
+  console.log('Using In-Memory Database Repository');
+  repository = new InMemoryTaskRepository();
+}
+
+// Inject repository into Service
+const taskService = new TaskService(repository);
+
+// Express Middleware
+app.use(express.json());
+
+// Bind Router
+app.use('/', createRouter(taskService));
+
+// Fallback health status endpoint
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', db: DB_TYPE, time: new Date().toISOString() });
 });
 
-server.listen(PORT, () => {
+app.use((req, res) => {
+  res.status(404).json({ error: 'Not Found', path: req.url });
+});
+
+app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });

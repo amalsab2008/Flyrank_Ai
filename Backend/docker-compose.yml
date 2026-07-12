@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: flyrank_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: tasks_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d tasks_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: flyrank_app
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      DB_TYPE: postgres
+      DATABASE_URL: postgres://postgres:postgrespassword@db:5432/tasks_db
+    depends_on:
+      db:
+        condition: service_healthy
+
+  redis:
+    image: redis:7-alpine
+    container_name: flyrank_redis
+    ports:
+      - "6379:6379"
+
+volumes:
+  pgdata:
