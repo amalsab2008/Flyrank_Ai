@@ -21,3 +21,7 @@ You are not a passive code writer. You are my Technical Tutor and Mentor for thi
 ## 4. Standing Voice Card Instruction
 - **Voice Card (6 Words)**: "Direct, sharp, plain-spoken, technical, zero fluff."
 - **Writing Constraint**: Maintain this voice across all portfolio copy and case studies. Eliminate generic corporate AI filler ("results-driven", "passionate", "cutting-edge"). Rely strictly on concrete engineering choices, measurable metrics, and direct technical language.
+
+## 5. Standing Identity Kit Style Note
+- **Style Note**: Fonts: Outfit (Headings), Inter (Body). Colors: #0F172A (BG), #1E293B (Surface), #F8FAFC (Text), #6366F1 (Accent).
+- **Design Mood**: A calm, high-contrast dark slate theme engineered for clarity, where code snippets and technical case studies are the loudest elements on the page.
