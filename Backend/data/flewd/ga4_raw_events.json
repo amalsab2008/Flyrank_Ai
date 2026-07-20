@@ -1,0 +1,42 @@
+[
+  {
+    "event_name": "page_view",
+    "event_timestamp": "2026-07-20T10:15:00Z",
+    "landing_page_url": "https://flewdstress.com/products/sleep-soak",
+    "geo_country": "USA",
+    "device_category": "mobile",
+    "engagement_time_msec": 45000
+  },
+  {
+    "event_name": "add_to_cart",
+    "event_timestamp": "2026-07-20T10:16:12Z",
+    "landing_page_url": "https://flewdstress.com/products/sleep-soak",
+    "geo_country": "USA",
+    "device_category": "mobile",
+    "value": 34.99
+  },
+  {
+    "event_name": "purchase",
+    "event_timestamp": "2026-07-20T10:18:05Z",
+    "landing_page_url": "https://flewdstress.com/products/sleep-soak",
+    "geo_country": "USA",
+    "device_category": "mobile",
+    "purchase_revenue": 34.99
+  },
+  {
+    "event_name": "page_view",
+    "event_timestamp": "2026-07-20T11:00:00Z",
+    "landing_page_url": "https://flewdstress.com/products/recovery-soak",
+    "geo_country": "USA",
+    "device_category": "desktop",
+    "engagement_time_msec": 12000
+  },
+  {
+    "event_name": "page_view",
+    "event_timestamp": "2026-07-20T11:30:00Z",
+    "landing_page_url": "https://flewdstress.com/blog/taurate-vs-glycinate",
+    "geo_country": "USA",
+    "device_category": "mobile",
+    "engagement_time_msec": 95000
+  }
+]
